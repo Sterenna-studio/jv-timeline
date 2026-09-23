@@ -3,7 +3,7 @@
 Timeline ludique des sorties de jeux vidéo de 2016, issue de BZH Chronicles.
 Application HTML statique autonome, sans compilation ni backend.
 
-- Dépôt prévu : `Sterenna-studio/jv-timeline` (pas encore créé).
+- Dépôt : [Sterenna-studio/jv-timeline](https://github.com/Sterenna-studio/jv-timeline).
 - URL prévue : `https://nitro.sterenna.fr/timeline/` (pas encore publiée).
 - Sources actives : `public/`.
 - Originaux v1, v2 et v3 conservés intégralement dans `archive/` ; v3 sert de base.
@@ -62,8 +62,9 @@ Skill Arena est un autre produit et n'est pas nécessaire à cette application.
 4. Faire relire et fusionner la seconde branche du hub ajoutant la carte Timeline
    et le sitemap. Cela évite un lien public avant que l'application soit disponible.
 
-Les workflows sont préparés mais n'ont pas encore tourné sur GitHub. Les secrets
-et droits d'organisation restent à vérifier lors de la création du dépôt.
+Les secrets OVH hérités de l'organisation ont été vérifiés par leur nom le
+23 septembre 2026, sans consulter leurs valeurs. Le premier déploiement reste
+à vérifier dans GitHub Actions.
 Seul `public/` est déployé : pas d'archives, tests, documentation ou fichiers Git.
 
 Pour revenir à une version antérieure, rétablir son contenu dans un nouveau commit
