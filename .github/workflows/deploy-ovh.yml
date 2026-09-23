@@ -1,0 +1,61 @@
+name: Deploy Timeline to Nitro
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-jv-timeline-ovh
+  cancel-in-progress: false
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+      - run: npm test
+      - run: npm run test:browser
+      - name: Verify hub preserves the Timeline directory
+        run: |
+          set -euo pipefail
+          curl --fail --silent --show-error --location \
+            https://raw.githubusercontent.com/Sterenna-studio/gwen-ha-star-static/main/.github/workflows/deploy-ovh.yml \
+            -o /tmp/nitro-deploy.yml
+          grep -F -- "--exclude='/timeline/'" /tmp/nitro-deploy.yml
+      - name: Setup SSH
+        env:
+          OVH_HOST: ${{ secrets.OVH_HOST }}
+          OVH_USER: ${{ secrets.OVH_USER }}
+          OVH_SSH_KEY: ${{ secrets.OVH_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "$OVH_HOST" && test -n "$OVH_USER" && test -n "$OVH_SSH_KEY"
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$OVH_SSH_KEY" > ~/.ssh/ovh_key
+          chmod 600 ~/.ssh/ovh_key
+          ssh-keyscan -H "$OVH_HOST" >> ~/.ssh/known_hosts
+      - name: Deploy public files only
+        env:
+          OVH_HOST: ${{ secrets.OVH_HOST }}
+          OVH_USER: ${{ secrets.OVH_USER }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/ovh_key "$OVH_USER@$OVH_HOST" 'mkdir -p ~/nitro/timeline'
+          rsync -avz --delete -e 'ssh -i ~/.ssh/ovh_key' \
+            public/ "$OVH_USER@$OVH_HOST:~/nitro/timeline/"
+      - name: Verify published contents
+        run: |
+          set -euo pipefail
+          for file in index.html data/games_2016.json; do
+            curl --fail --silent --show-error --location \
+              --retry 3 --retry-delay 3 \
+              "https://nitro.sterenna.fr/timeline/$file?deploy=$GITHUB_SHA" -o /tmp/timeline-check
+            cmp "public/$file" /tmp/timeline-check
+          done
+      - name: Remove SSH key
+        if: always()
+        run: rm -f ~/.ssh/ovh_key
