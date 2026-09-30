@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Sterenna • BZH CHRONICLES — ChronoTablet</title>
+  <style>
+
+    :root{
+      --bg0:#05060b; --bg1:#070a12;
+      --text:#d9e3ff; --muted:#a9b7e6;
+      --neonA:#22ffd6; --neonB:#a855ff; --neonC:#ff2d6d; --metal:#c08a3a;
+      --ok:#46ff8d; --warn:#ffd166; --danger:#ff476f;
+
+      --radius:18px;
+      --shadow: 0 12px 40px rgba(0,0,0,.55);
+      --shadow2: 0 8px 22px rgba(0,0,0,.45);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 800px at 10% 15%, rgba(168,85,255,.18), transparent 60%),
+        radial-gradient(900px 700px at 80% 20%, rgba(34,255,214,.14), transparent 55%),
+        radial-gradient(800px 600px at 50% 85%, rgba(255,45,109,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg0), var(--bg1));
+      color:var(--text);
+      font-family:var(--sans);
+      overflow-x:hidden;
+    }
+
+    .bg-grid{
+      position:fixed; inset:0; pointer-events:none; opacity:.18;
+      background-image:
+        linear-gradient(to right, rgba(34,255,214,.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(168,85,255,.06) 1px, transparent 1px);
+      background-size:48px 48px;
+      mix-blend-mode:screen;
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:28px 18px 60px;}
+    .hidden{display:none !important;}
+
+    /* Shared UI */
+    .panel{
+      background:linear-gradient(180deg,rgba(11,16,32,.88),rgba(11,16,32,.70));
+      border:1px solid rgba(34,255,214,.18);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:14px 14px;
+    }
+    button, select{
+      background:rgba(7,10,18,.65);
+      color:var(--text);
+      border:1px solid rgba(34,255,214,.22);
+      border-radius:14px;
+      padding:10px 12px;
+      font-family:var(--mono);
+      font-size:13px;
+      outline:none;
+      box-shadow:var(--shadow2);
+      transition: transform .08s ease, border-color .15s ease, background .15s ease;
+      user-select:none;
+    }
+    button:hover, select:hover{border-color:rgba(34,255,214,.45);transform:translateY(-1px);}
+    button:active{transform:translateY(0px) scale(.99)}
+    button.primary{border-color:rgba(168,85,255,.45);box-shadow:0 0 0 2px rgba(168,85,255,.12),var(--shadow2);}
+    button.danger{border-color:rgba(255,45,109,.45);}
+    button.ghost{border-color:rgba(185,195,235,.18); opacity:.95;}
+    button:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+
+    /* Branding */
+    .brandline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .sigil{width:12px;height:12px;border-radius:999px;background:conic-gradient(from 180deg,var(--neonA),var(--neonB),var(--neonC),var(--neonA));
+      box-shadow:0 0 18px rgba(34,255,214,.35),0 0 22px rgba(168,85,255,.22);}
+    .glitch{position:relative;text-shadow:0 0 22px rgba(34,255,214,.12),0 0 28px rgba(168,85,255,.10);}
+    .glitch:before,.glitch:after{content:attr(data-text);position:absolute;left:0;top:0;opacity:.18;pointer-events:none;clip-path:inset(0 0 60% 0);}
+    .glitch:before{transform:translate(1px,-1px);color:var(--neonA);}
+    .glitch:after{transform:translate(-1px,1px);color:var(--neonC);clip-path:inset(55% 0 0 0);}
+
+    /* Home / ChronoTablet */
+    .home{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap:14px;
+      align-items:stretch;
+      margin-top:14px;
+    }
+    @media (max-width: 980px){ .home{grid-template-columns:1fr;} }
+
+    .tablet{
+      position:relative;
+      border-radius:26px;
+      overflow:hidden;
+      border:1px solid rgba(34,255,214,.22);
+      background: linear-gradient(180deg, rgba(11,16,32,.92), rgba(11,16,32,.70));
+      box-shadow: var(--shadow);
+      padding:18px 18px;
+      min-height: 360px;
+    }
+    .tablet:before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(640px 160px at 15% 0%, rgba(34,255,214,.12), transparent 58%),
+        radial-gradient(620px 180px at 85% 15%, rgba(168,85,255,.12), transparent 62%),
+        radial-gradient(720px 220px at 50% 110%, rgba(255,45,109,.08), transparent 60%);
+      pointer-events:none;
+    }
+    .tablet:after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(to bottom,
+          rgba(255,255,255,.05) 0px,
+          rgba(255,255,255,.02) 2px,
+          rgba(0,0,0,0) 6px
+        );
+      opacity:.18;
+      mix-blend-mode:overlay;
+      pointer-events:none;
+    }
+
+    .tablet-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      position:relative;
+    }
+    h1{margin:0;font-size: clamp(22px, 2.6vw, 34px);letter-spacing:.3px;line-height:1.1;}
+    .subtitle{margin:10px 0 0;color:var(--muted);font-family:var(--mono);font-size:13px;line-height:1.4;opacity:.95;}
+    .hr{height:1px;background:linear-gradient(90deg, transparent, rgba(34,255,214,.35), rgba(168,85,255,.22), transparent);margin:14px 0;opacity:.85;}
+
+    .how{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+      position:relative;
+    }
+    @media (max-width: 680px){ .how{grid-template-columns:1fr;} }
+
+    .step{
+      border:1px solid rgba(34,255,214,.14);
+      border-radius:18px;
+      padding:12px 12px;
+      background: rgba(7,10,18,.28);
+      box-shadow: var(--shadow2);
+    }
+    .step h3{margin:0 0 8px;font-family:var(--mono);font-size:12px;color:#eaf0ff;}
+    .step p{margin:0;color:rgba(217,227,255,.86);font-size:12px;line-height:1.45;}
+    .k{color: #fff; font-family: var(--mono);}
+
+    .year-panel{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .year-grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:10px;
+    }
+    @media (max-width: 980px){ .year-grid{grid-template-columns: repeat(3, 1fr);} }
+    @media (max-width: 680px){ .year-grid{grid-template-columns: repeat(2, 1fr);} }
+
+    .year-btn{
+      padding:14px 12px;
+      border-radius:18px;
+      text-align:left;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      position:relative;
+      overflow:hidden;
+    }
+    .year-btn small{
+      font-family:var(--mono);
+      color:rgba(217,227,255,.88);
+      opacity:.95;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(192,138,58,.35);
+      background: rgba(192,138,58,.10);
+      color:#ffe5be;
+      font-family:var(--mono);
+      font-size:11px;
+      width:max-content;
+    }
+    .badge .dot{width:8px;height:8px;border-radius:99px;background:var(--metal);box-shadow:0 0 12px rgba(192,138,58,.35);}
+    .soon{
+      opacity:.55;
+      border-color: rgba(185,195,235,.18) !important;
+    }
+
+    .side-note{
+      color:rgba(217,227,255,.82);
+      font-family:var(--mono);
+      font-size:12px;
+      line-height:1.45;
+      padding:14px 14px;
+    }
+
+    /* Timeline layout */
+    header.timeline-head{
+      display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;margin-bottom:18px;
+    }
+    .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+    .title{display:flex;flex-direction:column;gap:8px;min-width:min(680px,100%);}
+
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border-radius:999px;
+      border:1px solid rgba(192,138,58,.35);background:rgba(192,138,58,.10);
+      font-family:var(--mono);font-size:12px;color:#ffe5be;}
+    .chip b{color:#fff}
+    .chip .dot{width:8px;height:8px;border-radius:99px;background:var(--metal);box-shadow:0 0 12px rgba(192,138,58,.35);}
+    .meta-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:10px;}
+    .legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-start;color:var(--muted);
+      font-family:var(--mono);font-size:12px;opacity:.95;}
+    .legend span{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(34,255,214,.12);background:rgba(34,255,214,.06);}
+    .sw{width:10px;height:10px;border-radius:3px;background:rgba(34,255,214,.35);border:1px solid rgba(34,255,214,.55);}
+    .sw.gray{background:rgba(185,195,235,.12);border-color:rgba(185,195,235,.22);}
+    .sw.hidden{background:rgba(255,45,109,.12);border-color:rgba(255,45,109,.25);}
+
+    /* Screen effect wrapper */
+    .screen{
+      position:relative;
+      border-radius: 22px;
+      overflow:hidden;
+      border:1px solid rgba(34,255,214,.20);
+      background: linear-gradient(180deg, rgba(11,16,32,.92), rgba(11,16,32,.70));
+      box-shadow: var(--shadow);
+      transform: translateZ(0);
+    }
+    .screen .screen-inner{
+      padding:14px 14px;
+      position:relative;
+      animation: wobble 6.5s ease-in-out infinite;
+      transform-origin: 55% 30%;
+    }
+    @keyframes wobble{
+      0%{ transform: translateY(0px) rotate(0deg) }
+      35%{ transform: translateY(-1px) rotate(-0.08deg) }
+      70%{ transform: translateY(1px) rotate(0.10deg) }
+      100%{ transform: translateY(0px) rotate(0deg) }
+    }
+    .screen:before{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        radial-gradient(900px 240px at 18% 0%, rgba(34,255,214,.10), transparent 62%),
+        radial-gradient(820px 260px at 85% 10%, rgba(168,85,255,.10), transparent 65%),
+        linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,0));
+      opacity:.55;
+      pointer-events:none;
+      mix-blend-mode:screen;
+    }
+    .screen:after{
+      content:"";
+      position:absolute; inset:0;
+      background:
+        repeating-linear-gradient(to bottom,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.02) 2px,
+          rgba(0,0,0,0) 7px
+        ),
+        radial-gradient(1200px 600px at 50% 110%, rgba(255,45,109,.06), transparent 60%);
+      opacity:.22;
+      pointer-events:none;
+    }
+    .bezel{
+      position:absolute; inset:0;
+      border-radius: 22px;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.06),
+        inset 0 0 0 18px rgba(0,0,0,.14);
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    /* Energy bar */
+    .daily-wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+    #dailyRevealBtn{font-size:13px;padding:10px 18px;border-color:rgba(34,255,214,.45);box-shadow:0 0 0 2px rgba(34,255,214,.10),var(--shadow2);letter-spacing:.04em;}
+    #dailyRevealBtn:disabled{opacity:.35;cursor:not-allowed;transform:none;}
+    .energy-hint{font-family:var(--mono);font-size:11px;color:rgba(169,183,230,.95);}
+    .card.done{border-color:rgba(70,255,141,.32)!important;}
+    .card.done .pill{background:#46ff8d!important;box-shadow:0 0 12px rgba(70,255,141,.35)!important;}
+    .done-mark{position:absolute;top:8px;right:10px;font-size:13px;color:#46ff8d;font-family:var(--mono);pointer-events:none;}
+    .year-btn.locked{opacity:.42;cursor:not-allowed;}
+    .year-btn.locked:hover{transform:none!important;}
+    .badge-locked{border-color:rgba(185,195,235,.22)!important;background:rgba(185,195,235,.08)!important;color:rgba(217,227,255,.60)!important;}
+    .dot-locked{background:rgba(185,195,235,.40)!important;box-shadow:none!important;}
+    .save-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px;}
+    #importFileInput{display:none;}
+
+    /* Timeline cards */
+    .month-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .month-title{margin:0;font-size:18px;font-family:var(--mono);color:#eaf0ff;}
+    .month-title small{color:var(--muted);font-size:12px;font-weight:400;margin-left:8px;}
+    .cards{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:12px;}
+    .card{
+      grid-column:span 6;
+      background:linear-gradient(180deg,rgba(11,16,32,.92),rgba(11,16,32,.74));
+      border:1px solid rgba(34,255,214,.14);
+      border-radius:var(--radius);
+      padding:12px 12px;
+      box-shadow:var(--shadow2);
+      position:relative;
+      overflow:hidden;
+      cursor:pointer;
+      user-select:none;
+      transition: transform .12s ease, border-color .15s ease, filter .15s ease;
+    }
+    @media (max-width:860px){.card{grid-column:span 12;}}
+    .card:before{
+      content:"";position:absolute;inset:-2px;
+      background:
+        radial-gradient(500px 120px at 15% 0%, rgba(34,255,214,.10), transparent 55%),
+        radial-gradient(480px 140px at 85% 10%, rgba(168,85,255,.10), transparent 55%),
+        radial-gradient(520px 140px at 50% 110%, rgba(255,45,109,.08), transparent 60%);
+      pointer-events:none;
+    }
+    .card:hover{border-color:rgba(34,255,214,.38);transform: translateY(-2px);}
+    .row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;position:relative;}
+    .date{font-family:var(--mono);font-size:12px;color:var(--neonA);opacity:.95;white-space:nowrap;}
+    .name{margin:0;font-size:15px;line-height:1.25;letter-spacing:.1px;}
+    .tags{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;position:relative;}
+    .tag{font-family:var(--mono);font-size:11px;padding:5px 8px;border-radius:999px;border:1px solid rgba(168,85,255,.25);
+      background:rgba(168,85,255,.10);color:#efe2ff;}
+    .tag.platform{border-color:rgba(34,255,214,.20);background:rgba(34,255,214,.08);color:#dffff8;}
+    .status{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--muted);position:relative;display:flex;align-items:center;gap:8px;}
+    .pill{width:8px;height:8px;border-radius:999px;background:var(--ok);box-shadow:0 0 12px rgba(70,255,141,.25);}
+    .card.upcoming{opacity:.55;filter:saturate(.7);border-color:rgba(185,195,235,.18);}
+    .card.upcoming .date{color:rgba(185,195,235,.85);}
+    .card.upcoming .pill{background:var(--warn);box-shadow:0 0 12px rgba(255,209,102,.20);}
+    .card.hidden{opacity:.22;filter:blur(.6px) saturate(.5);border-color:rgba(255,45,109,.15);transform:none;}
+    .card.hidden:hover{transform:none;border-color:rgba(255,45,109,.22);}
+    .card.hidden .date{color:rgba(255,45,109,.65)}
+    .card.hidden .pill{background:var(--danger);box-shadow:0 0 12px rgba(255,71,111,.20);}
+    .card.hidden .tag,.card.hidden .tags,.card.hidden .status{display:none;}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:18px;z-index:50;}
+    .modal{width:min(880px,100%);background:linear-gradient(180deg,rgba(11,16,32,.95),rgba(11,16,32,.78));
+      border:1px solid rgba(34,255,214,.22);border-radius:20px;box-shadow:0 18px 60px rgba(0,0,0,.65);overflow:hidden;}
+    .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 14px;border-bottom:1px solid rgba(34,255,214,.14);}
+    .modal-title{margin:0;font-family:var(--mono);font-size:16px;line-height:1.3;}
+    .modal-close{border-radius:12px;padding:8px 10px;}
+    .modal-body{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;padding:14px 14px 16px;}
+    @media (max-width:860px){.modal-body{grid-template-columns:1fr;}}
+    .hero{border-radius:18px;overflow:hidden;border:1px solid rgba(168,85,255,.18);background:rgba(168,85,255,.06);
+      min-height:160px;display:flex;align-items:center;justify-content:center;}
+    .hero img{width:100%;height:auto;display:block;}
+    .modal-meta{display:flex;flex-direction:column;gap:10px;}
+    .modal-line{font-family:var(--mono);font-size:12px;color:rgba(217,227,255,.9);}
+    .modal-line b{color:#fff}
+    .modal-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px;}
+    a.btnlink{display:inline-flex;align-items:center;gap:8px;text-decoration:none;background:rgba(7,10,18,.65);
+      border:1px solid rgba(34,255,214,.22);border-radius:14px;padding:10px 12px;font-family:var(--mono);font-size:13px;color:var(--text);box-shadow:var(--shadow2);}
+    a.btnlink:hover{border-color:rgba(34,255,214,.45);transform:translateY(-1px);}
+
+    /* Toast */
+    .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+      background:rgba(11,16,32,.92);
+      border:1px solid rgba(34,255,214,.18);
+      border-radius:999px;
+      padding:10px 14px;
+      font-family:var(--mono);
+      font-size:12px;
+      color:rgba(217,227,255,.95);
+      box-shadow:var(--shadow2);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index:60;
+    }
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px);}
+
+    /* Small UX touches */
+    .hint-row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      justify-content:space-between;
+      margin-top:10px;
+    }
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(34,255,214,.18);
+      background: rgba(34,255,214,.06);
+      font-family:var(--mono);
+      font-size:12px;
+      color: rgba(217,227,255,.92);
+    }
+    .toggle .led{
+      width:10px;height:10px;border-radius:99px;
+      background: rgba(185,195,235,.20);
+      border:1px solid rgba(185,195,235,.30);
+      box-shadow:none;
+    }
+    .toggle.on .led{
+      background: rgba(34,255,214,.55);
+      border-color: rgba(34,255,214,.65);
+      box-shadow: 0 0 16px rgba(34,255,214,.22);
+    }
+    .toggle button{
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      box-shadow:none;
+    }
+  
+  </style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="wrap">
+
+  <!-- ══════ HOME ══════ -->
+  <section id="homeView">
+    <div class="panel">
+      <div class="brandline">
+        <div class="sigil" aria-hidden="true"></div>
+        <h1 class="glitch" data-text="CHRONOTABLET STERENNA">CHRONOTABLET STERENNA</h1>
+      </div>
+      <p class="subtitle">
+        Interface de saut temporel ludique — timeline des sorties de jeux majeurs par mois.
+        <span style="color:rgba(255,229,190,.9)">BZH CHRONICLES UI</span>.
+      </p>
+      <div class="toggle" id="sfxToggleHome">
+        <span class="led" id="sfxLedHome"></span><span>SFX</span>
+        <button id="sfxBtnHome" class="ghost" type="button">ON/OFF</button>
+      </div>
+    </div>
+
+    <div class="home">
+      <div class="tablet" aria-label="Tablette de voyage ludique">
+        <div class="tablet-head">
+          <div>
+            <div class="brandline" style="gap:10px">
+              <span class="badge"><span class="dot"></span> MODULE G.A.M.E. CHRONO-ARCHIVE</span>
+            </div>
+            <p class="subtitle" style="margin-top:10px">
+              Principe : ta date réelle est projetée sur l'année cible
+              (ex: 29/01/2026 → 29/01/2016). Les sorties à venir dans les
+              <span class="k">15 jours</span> sont grisées. Au-delà, elles sont
+              <span class="k">chiffrées</span> et nécessitent le
+              <span class="k">reveal quotidien</span> pour être dévoilées.
+            </p>
+          </div>
+        </div>
+        <div class="hr"></div>
+        <div class="how">
+          <div class="step">
+            <h3>1) Choisis un saut temporel</h3>
+            <p>Années disponibles selon ta date réelle (2026 → 2016, 2027 → 2017…)</p>
+          </div>
+          <div class="step">
+            <h3>2) Navigue par mois</h3>
+            <p>Flèches + liste déroulante. Clique un jeu visible pour sa fiche Steam.</p>
+          </div>
+          <div class="step">
+            <h3>3) Reveal quotidien aléatoire</h3>
+            <p>Une fois par jour, un tile masqué est révélé au hasard — <span class="k">sur toutes les années</span>.</p>
+          </div>
+          <div class="step">
+            <h3>4) Mémoire locale</h3>
+            <p>Reveals, jeux faits, préférences → <span class="k">localStorage</span>. Export/Import save disponible.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel year-panel">
+        <div class="brandline">
+          <div class="sigil" aria-hidden="true"></div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="font-family:var(--mono);color:#eaf0ff;font-size:14px">Sélection de l'année</div>
+            <div class="subtitle" style="margin:0">Les années se débloquent au fil du temps réel.</div>
+          </div>
+        </div>
+        <div class="year-grid" id="yearGrid" style="margin-top:10px;"></div>
+        <div class="save-row">
+          <button id="exportSaveBtn" class="ghost" title="Exporter la save (JSON)">💾 Export Save</button>
+          <button id="importSaveBtn" class="ghost" title="Importer une save (JSON)">📂 Import Save</button>
+          <input type="file" id="importFileInput" accept=".json" />
+        </div>
+        <div class="side-note" style="margin-top:10px">Tip : lance en <code>python -m http.server 8000</code> pour éviter les blocages CORS.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ TIMELINE ══════ -->
+  <section id="timelineView" class="hidden">
+    <header class="timeline-head">
+      <div class="title">
+        <div class="brandline">
+          <div class="sigil" aria-hidden="true"></div>
+          <h1 class="glitch" id="timelineTitle" data-text="BZH CHRONICLES">BZH CHRONICLES</h1>
+        </div>
+        <p class="subtitle">gris = ≤15 jours | masqué au-delà | 1 reveal aléatoire / jour | tile → fiche</p>
+      </div>
+      <div class="panel controls" role="group" aria-label="Contrôles">
+        <button id="homeBtn"  class="ghost" title="Retour accueil">HOME</button>
+        <button id="prevBtn"  title="Mois précédent">◀</button>
+        <select id="monthSelect" aria-label="Choisir un mois"></select>
+        <button id="nextBtn"  title="Mois suivant">▶</button>
+        <button id="resetBtn" class="danger" title="Reset reveals + faits (localStorage)">RESET</button>
+      </div>
+    </header>
+
+    <section class="screen" aria-label="Ecran calendrier">
+      <div class="bezel" aria-hidden="true"></div>
+      <div class="screen-inner">
+        <div class="meta-row">
+          <div class="chip">
+            <span class="dot"></span>
+            <span>Réel: <b id="realNow">—</b> → Timeline: <b id="timelineNow">—</b></span>
+          </div>
+          <div class="daily-wrap">
+            <button id="dailyRevealBtn" class="primary" title="Révèle un tile masqué aléatoire — 1 fois par jour">✦ REVEAL DU JOUR</button>
+            <span id="dailyRevealHint" class="energy-hint"></span>
+          </div>
+          <div class="toggle" id="sfxToggle" title="Sons UI">
+            <span class="led" id="sfxLed"></span><span>SFX</span>
+            <button id="sfxBtn" class="ghost" type="button">ON/OFF</button>
+          </div>
+        </div>
+
+        <div class="hint-row">
+          <div class="legend" aria-label="Légende">
+            <span><span class="sw"></span> Visible</span>
+            <span><span class="sw gray"></span> À venir ≤15 jours</span>
+            <span><span class="sw hidden"></span> Masqué &gt;15 jours</span>
+            <span><span class="sw" style="background:rgba(70,255,141,.35);border-color:rgba(70,255,141,.55)"></span> Fait ✓</span>
+          </div>
+          <div class="chip">
+            <span class="dot"></span>
+            <span>Fenêtre: <b id="windowStart">—</b> → <b id="windowEnd">—</b></span>
+          </div>
+        </div>
+
+        <div class="hr"></div>
+        <div class="month-head">
+          <h2 class="month-title" id="monthTitle"></h2>
+        </div>
+        <div class="cards" id="cards"></div>
+      </div>
+    </section>
+  </section>
+
+</div><!-- /wrap -->
+
+<!-- ══════ MODAL ══════ -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <h3 class="modal-title" id="modalTitle"></h3>
+        <div class="modal-line" id="modalSub"></div>
+      </div>
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="hero" id="modalHero"></div>
+      <div class="modal-meta">
+        <div class="modal-line"><b>Date </b> <span id="modalDate"></span></div>
+        <div class="modal-line"><b>Plateformes </b> <span id="modalPlatforms"></span></div>
+        <div class="modal-line"><b>Genres </b> <span id="modalGenres"></span></div>
+        <div class="modal-line" id="modalNote" style="display:none"></div>
+        <div class="modal-actions" id="modalActions"></div>
+        <button id="doneToggleBtn" class="primary" style="margin-top:8px">✅ Marquer comme fait</button>
+        <div class="modal-line" style="opacity:.85;margin-top:6px">Si un jeu n'est pas sur Steam, ajoute <code>steam_url</code> dans le JSON.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">—</div>
+
+<script>
+
+  // ── Helpers ─────────────────────────────────────────────────────────────
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()}`;
+  const parseISO = s => { const [Y,M,D]=s.split('-').map(Number); return new Date(Y,M-1,D); };
+  const monthNames = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+  // ── Projection temporelle ────────────────────────────────────────────────
+  // 2026 réel → 2016 cible  /  2027 réel → 2017 cible, etc.
+  const REAL_NOW   = new Date();
+  const REAL_YEAR  = REAL_NOW.getFullYear();           // ex: 2026
+  const OFFSET     = 10;                               // écart fixe
+  const YEARS_LIST = [2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+
+  function targetYearFor(realY){ return realY - OFFSET; }   // 2026 → 2016
+  function maxUnlockedYear(){ return REAL_YEAR - OFFSET; }  // dernière année jouable
+
+  // Dans l'année cible, la "date projetée" = même jour/mois que la vraie date
+  function timelineNowForYear(y){
+    return new Date(y, REAL_NOW.getMonth(), REAL_NOW.getDate());
+  }
+
+  // ── SFX ──────────────────────────────────────────────────────────────────
+  // SFX engine (no files)
+    const SFX = (()=>{
+      let ctx=null;
+      let enabled=true;
+
+      function ensure(){
+        if(ctx) return ctx;
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if(!AC) return null;
+        ctx = new AC();
+        return ctx;
+      }
+      function unlock(){
+        const c = ensure();
+        if(!c) return;
+        if(c.state === "suspended") c.resume().catch(()=>{});
+      }
+      function ping(freq=420, dur=0.06, type="sine", gain=0.08){
+        if(!enabled) return;
+        const c = ensure();
+        if(!c) return;
+        const t0 = c.currentTime;
+        const o = c.createOscillator();
+        const g = c.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, t0);
+        g.gain.setValueAtTime(0.0001, t0);
+        g.gain.exponentialRampToValueAtTime(gain, t0 + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+        o.connect(g); g.connect(c.destination);
+        o.start(t0);
+        o.stop(t0 + dur + 0.01);
+      }
+      function blip(pattern){
+        if(!enabled) return;
+        if(pattern==="nav"){ ping(560,0.05,"triangle",0.07); setTimeout(()=>ping(680,0.05,"triangle",0.07), 55); return; }
+        if(pattern==="open"){ ping(520,0.06,"sine",0.08); setTimeout(()=>ping(760,0.07,"sine",0.07), 70); return; }
+        if(pattern==="close"){ ping(520,0.05,"sine",0.07); setTimeout(()=>ping(360,0.06,"sine",0.06), 55); return; }
+        if(pattern==="reveal"){ ping(320,0.06,"square",0.05); setTimeout(()=>ping(420,0.06,"square",0.05), 55); setTimeout(()=>ping(820,0.07,"triangle",0.06), 110); return; }
+        if(pattern==="error"){ ping(180,0.09,"sawtooth",0.06); setTimeout(()=>ping(150,0.10,"sawtooth",0.05), 80); return; }
+        if(pattern==="reset"){ ping(240,0.05,"square",0.05); setTimeout(()=>ping(240,0.05,"square",0.05), 55); setTimeout(()=>ping(460,0.08,"triangle",0.06), 120); return; }
+        if(pattern==="boot"){ ping(260,0.07,"sine",0.06); setTimeout(()=>ping(340,0.07,"sine",0.06), 70); setTimeout(()=>ping(520,0.08,"triangle",0.07), 140); return; }
+        ping();
+      }
+      function setEnabled(v){ enabled=!!v; }
+      function isEnabled(){ return enabled; }
+      return { unlock, blip, setEnabled, isEnabled };
+    })();
+
+  const LS_UI = { SFX: "BZH2016_SFX_ENABLED" };
+    function loadSfxPref(){
+      const raw = localStorage.getItem(LS_UI.SFX);
+      if(raw === null) return true;
+      return raw === "1";
+    }
+    function saveSfxPref(v){ localStorage.setItem(LS_UI.SFX, v ? "1" : "0"); }
+
+  // ── LocalStorage ─────────────────────────────────────────────────────────
+  const LS = {
+    YEAR    : 'BZH_YEAR',
+    MONTH   : 'BZH_MONTH',
+    REVEALED: 'BZH_REVEALED',   // { "2016:2016-05-13:DOOM (2016)": true }
+    DONE    : 'BZH_DONE',       // même format
+    DAILY   : 'BZH_DAILY',      // { date:"YYYY-M-D", key:"...", year:2016 }
+    SFX     : 'BZH_SFX'
+  };
+
+  function lsGet(k){ return localStorage.getItem(k); }
+  function lsSet(k,v){ localStorage.setItem(k,v); }
+  function lsJson(k){ try{ const r=lsGet(k); return r?JSON.parse(r):{}; }catch{ return {}; } }
+  function lsJsonSet(k,obj){ lsSet(k,JSON.stringify(obj)); }
+
+  function todayStr(){ const d=new Date(); return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`; }
+
+  // Revealed
+  function getRevealed(){ return lsJson(LS.REVEALED); }
+  function setRevealed(obj){ lsJsonSet(LS.REVEALED, obj); }
+  function revealKey(k){ const o=getRevealed(); o[k]=true; setRevealed(o); }
+  function isRevealed(k){ return !!getRevealed()[k]; }
+
+  // Done
+  function getDone(){ return lsJson(LS.DONE); }
+  function setDone(obj){ lsJsonSet(LS.DONE, obj); }
+  function toggleDone(k){ const o=getDone(); if(o[k]) delete o[k]; else o[k]=true; setDone(o); }
+  function isDone(k){ return !!getDone()[k]; }
+
+  // Daily
+  function getDaily(){ return lsJson(LS.DAILY); }
+  function hasUsedDaily(){ const d=getDaily(); return !!(d&&d.date===todayStr()); }
+  function setDaily(key,year){ lsJsonSet(LS.DAILY,{date:todayStr(),key,year}); }
+
+  // Clé unique pour un jeu : "année:date:titre"
+  function gameKey(year, g){ return `${year}:${g.d}:${g.t}`; }
+
+  // ── Export / Import Save ─────────────────────────────────────────────────
+  function exportSave(){
+    const save = {
+      version  : 2,
+      exported : new Date().toISOString(),
+      year     : lsGet(LS.YEAR),
+      month    : lsGet(LS.MONTH),
+      revealed : getRevealed(),
+      done     : getDone(),
+      daily    : getDaily()
+    };
+    const blob = new Blob([JSON.stringify(save,null,2)],{type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'bzh-chronicles-save.json';
+    a.click();
+    toast('💾 Save exportée !');
+  }
+  function importSave(file){
+    const r = new FileReader();
+    r.onload = e => {
+      try{
+        const s = JSON.parse(e.target.result);
+        if(s.revealed) lsJsonSet(LS.REVEALED, s.revealed);
+        if(s.done)     lsJsonSet(LS.DONE,     s.done);
+        if(s.daily)    lsJsonSet(LS.DAILY,     s.daily);
+        if(s.year)     lsSet(LS.YEAR,  s.year);
+        if(s.month)    lsSet(LS.MONTH, s.month);
+        toast('📂 Save importée — rechargement…');
+        setTimeout(()=>location.reload(), 800);
+      } catch{ toast('❌ Fichier invalide.'); }
+    };
+    r.readAsText(file);
+  }
+
+  // ── Toast ────────────────────────────────────────────────────────────────
+  function toast(msg){
+    const t=document.getElementById('toast');
+    t.textContent=msg; t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),1600);
+  }
+
+  // ── SFX prefs ────────────────────────────────────────────────────────────
+  function loadSfxPref(){ const r=lsGet(LS.SFX); return r===null?true:r==='1'; }
+  function saveSfxPref(v){ lsSet(LS.SFX, v?'1':'0'); }
+
+  // ── Données jeux ─────────────────────────────────────────────────────────
+  const gamesCache = {};  // { 2016: [...], 2017: [...] }
+
+  async function loadGames(year){
+    if(gamesCache[year]) return gamesCache[year];
+    try{
+      const res = await fetch(`./data/games_${year}.json`,{cache:'no-store'});
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      gamesCache[year] = data;
+      return data;
+    } catch(e){
+      return null;  // pas de données pour cette année
+    }
+  }
+
+  // Charger toutes les années débloquées en cache (pour daily reveal global)
+  async function preloadAllYears(){
+    const max = maxUnlockedYear();
+    for(const y of YEARS_LIST){
+      if(y <= max) await loadGames(y);
+    }
+  }
+
+  // ── Classify (par rapport à la projection de l'année cible) ─────────────
+  function classify(g, year){
+    const tNow    = timelineNowForYear(year);
+    const winEnd  = new Date(tNow); winEnd.setDate(winEnd.getDate()+15);
+    const dt      = parseISO(g.d);
+    const isFutureOrToday = dt >= tNow;
+    const within15 = isFutureOrToday && dt <= winEnd;
+    const beyond15 = isFutureOrToday && dt >  winEnd;
+    return { within15, beyond15 };
+  }
+
+  function steamUrl(g){
+    if(g.steam_url)   return g.steam_url;
+    if(g.steam_appid) return `https://store.steampowered.com/app/${g.steam_appid}`;
+    return null;
+  }
+  function steamImg(g){
+    if(!g.steam_appid) return null;
+    return `https://cdn.akamai.steamstatic.com/steam/apps/${g.steam_appid}/header.jpg`;
+  }
+
+  // ── Vues ─────────────────────────────────────────────────────────────────
+  const homeView     = document.getElementById('homeView');
+  const timelineView = document.getElementById('timelineView');
+
+  function showHome(){
+    timelineView.classList.add('hidden');
+    homeView.classList.remove('hidden');
+    history.replaceState(null,'','#home');
+    SFX.blip('close');
+    updateSaveButtons();
+  }
+
+  let currentYear  = maxUnlockedYear();
+  let currentMonth = REAL_NOW.getMonth();
+
+  function showTimeline(year){
+    year = year || currentYear;
+    currentYear = year;
+    lsSet(LS.YEAR, String(year));
+    homeView.classList.add('hidden');
+    timelineView.classList.remove('hidden');
+    history.replaceState(null,'','#'+year);
+    SFX.blip('boot');
+    initTimeline(year);
+  }
+
+  // ── Timeline init ─────────────────────────────────────────────────────────
+  let timelineInited = false;
+
+  function initTimeline(year){
+    // restore month
+    const savedMonth = Number(lsGet(LS.MONTH));
+    if(!isNaN(savedMonth) && savedMonth>=0 && savedMonth<=11) currentMonth=savedMonth;
+    else currentMonth = REAL_NOW.getMonth();
+
+    // header dates
+    const tNow   = timelineNowForYear(year);
+    const winEnd = new Date(tNow); winEnd.setDate(winEnd.getDate()+15);
+    document.getElementById('realNow').textContent     = fmt(REAL_NOW);
+    document.getElementById('timelineNow').textContent = fmt(tNow);
+    document.getElementById('windowStart').textContent = fmt(tNow);
+    document.getElementById('windowEnd').textContent   = fmt(winEnd);
+
+    // title
+    document.getElementById('timelineTitle').textContent = `BZH CHRONICLES — Timeline ${year}`;
+
+    // select mois
+    const sel = document.getElementById('monthSelect');
+    sel.innerHTML = monthNames.map((n,i)=>`<option value="${i}">${n} ${year}</option>`).join('');
+    sel.value = String(currentMonth);
+
+    if(!timelineInited){
+      timelineInited = true;
+      sel.addEventListener('change', e=>{ SFX.unlock(); currentMonth=Number(e.target.value); lsSet(LS.MONTH,e.target.value); SFX.blip('nav'); render(); });
+      document.getElementById('prevBtn').addEventListener('click',()=>{ SFX.unlock(); currentMonth=(currentMonth+11)%12; lsSet(LS.MONTH,String(currentMonth)); SFX.blip('nav'); render(); });
+      document.getElementById('nextBtn').addEventListener('click',()=>{ SFX.unlock(); currentMonth=(currentMonth+1)%12;  lsSet(LS.MONTH,String(currentMonth)); SFX.blip('nav'); render(); });
+      document.getElementById('resetBtn').addEventListener('click',()=>{
+        SFX.unlock();
+        localStorage.removeItem(LS.REVEALED);
+        localStorage.removeItem(LS.DONE);
+        localStorage.removeItem(LS.DAILY);
+        render(); updateDailyBtn();
+        toast('🔄 Reset OK'); SFX.blip('reset');
+      });
+      document.getElementById('homeBtn').addEventListener('click',()=>{ SFX.unlock(); showHome(); });
+
+      // Daily reveal button
+      document.getElementById('dailyRevealBtn').addEventListener('click', async ()=>{
+        SFX.unlock();
+        if(hasUsedDaily()){ toast("✦ Déjà utilisé aujourd'hui !"); SFX.blip('error'); return; }
+        // Collecter tous les tiles masqués non révélés dans toutes les années chargées
+        const pool = [];
+        for(const y of YEARS_LIST){
+          if(y > maxUnlockedYear()) continue;
+          const games = gamesCache[y] || await loadGames(y);
+          if(!games) continue;
+          for(const g of games){
+            const k = gameKey(y,g);
+            const {beyond15} = classify(g,y);
+            if(beyond15 && !isRevealed(k)) pool.push({g,y,k});
+          }
+        }
+        if(pool.length===0){ toast('✦ Aucun tile masqué disponible !'); SFX.blip('error'); return; }
+        const {g, y, k} = pool[Math.floor(Math.random()*pool.length)];
+        revealKey(k);
+        setDaily(k,y);
+        // Naviguer vers l'année + mois
+        currentYear  = y;
+        currentMonth = parseISO(g.d).getMonth();
+        lsSet(LS.YEAR, String(y));
+        lsSet(LS.MONTH, String(currentMonth));
+        initTimeline(y);
+        await render();
+        updateDailyBtn();
+        setTimeout(()=>{
+          const card = document.querySelector(`#cards .card[data-key="${CSS.escape(k)}"]`);
+          if(card) card.scrollIntoView({behavior:'smooth',block:'center'});
+        },120);
+        openModal(g, y, true);
+        SFX.blip('reveal');
+        toast(`✦ ${g.t} (${y}) — dévoilé !`);
+      });
+    }
+
+    updateDailyBtn();
+    render();
+  }
+
+  // ── Daily button state ────────────────────────────────────────────────────
+  function updateDailyBtn(){
+    const btn  = document.getElementById('dailyRevealBtn');
+    const hint = document.getElementById('dailyRevealHint');
+    if(!btn) return;
+    if(hasUsedDaily()){
+      btn.disabled = true;
+      const now = new Date(), midnight = new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+      const remain = Math.max(0, midnight-now);
+      const hh=Math.floor(remain/3600000), mm=Math.floor((remain%3600000)/60000), ss=Math.floor((remain%60000)/1000);
+      if(hint) hint.textContent = `Utilisé aujourd'hui — prochain dans ${pad(hh)}:${pad(mm)}:${pad(ss)}`;
+    } else {
+      btn.disabled = false;
+      if(hint) hint.textContent = 'Un reveal aléatoire disponible sur toutes les années !';
+    }
+  }
+  setInterval(updateDailyBtn, 1000);
+
+  // ── Render ────────────────────────────────────────────────────────────────
+  async function render(){
+    const year  = currentYear;
+    const games = gamesCache[year] || await loadGames(year);
+    const cards = document.getElementById('cards');
+
+    if(!games){
+      cards.innerHTML = `<div style="grid-column:span 12;padding:24px;font-family:var(--mono);color:var(--muted);text-align:center;">
+        Données pour ${year} non disponibles.<br>Ajoute <code>data/games_${year}.json</code> pour activer cette année.
+      </div>`;
+      return;
+    }
+
+    const monthGames = games
+      .filter(g => parseISO(g.d).getMonth()===currentMonth)
+      .sort((a,b)=>a.d.localeCompare(b.d));
+
+    document.getElementById('monthTitle').innerHTML =
+      `${monthNames[currentMonth]} ${year} <small>${fmt(new Date(year,currentMonth,1))} — ${fmt(new Date(year,currentMonth+1,0))}</small>`;
+
+    cards.innerHTML = '';
+    for(const g of monthGames){
+      const k = gameKey(year, g);
+      const {within15, beyond15} = classify(g, year);
+      const hidden = beyond15 && !isRevealed(k);
+      const done   = isDone(k);
+      const cls    = ['card', within15?'upcoming':'', hidden?'hidden':'', done?'done':''].filter(Boolean);
+      const platforms = (g.p||[]).slice(0,6).map(x=>`<span class="tag platform">${x}</span>`).join('');
+      const genres    = (g.g||[]).slice(0,6).map(x=>`<span class="tag">${x}</span>`).join('');
+      const statusTxt = beyond15 ? (hidden?'Masqué — au-delà de 15 jours':'Révélé') : within15 ? 'À venir (≤15j)' : 'Déjà sorti';
+      const pillCls   = done ? 'pill done-pill' : 'pill';
+
+      const el = document.createElement('article');
+      el.className = cls.join(' ');
+      el.dataset.key  = k;
+      el.dataset.hidden = hidden?'1':'0';
+      el.dataset.game = JSON.stringify(g);
+      el.dataset.year = String(year);
+      el.innerHTML = `
+        ${done?'<span class="done-mark">✓</span>':''}
+        <div class="row">
+          <div>
+            <div class="date">${fmt(parseISO(g.d))}</div>
+            <h3 class="name">${hidden ? '???' : g.t}</h3>
+          </div>
+          <div class="date" style="color:rgba(192,138,58,.95)">${hidden?monthNames[parseISO(g.d).getMonth()].slice(0,3).toUpperCase():''}</div>
+        </div>
+        <div class="tags">${hidden ? '' : platforms}${hidden ? '' : genres}</div>
+        <div class="status"><span class="${pillCls}"></span><span>${statusTxt}</span></div>`;
+
+      el.addEventListener('click', ()=>{
+        SFX.unlock();
+        if(el.dataset.hidden==='1'){
+          toast('✦ Utilise le bouton REVEAL DU JOUR pour dévoiler un tile aléatoire !');
+          SFX.blip('error'); return;
+        }
+        openModal(JSON.parse(el.dataset.game), Number(el.dataset.year), false);
+        SFX.blip('open');
+      });
+      cards.appendChild(el);
+    }
+    if(monthGames.length===0){
+      cards.innerHTML = `<div style="grid-column:span 12;padding:24px;font-family:var(--mono);color:var(--muted);text-align:center;">Aucune sortie notable ce mois-ci.</div>`;
+    }
+  }
+
+  // ── Modal ─────────────────────────────────────────────────────────────────
+  const backdrop = document.getElementById('modalBackdrop');
+
+  function openModal(g, year, justRevealed){
+    const k = gameKey(year, g);
+    document.getElementById('modalTitle').textContent = g.t;
+    document.getElementById('modalSub').textContent   = justRevealed ? `✦ Débloqué — ${year}` : `Détails — ${year}`;
+    document.getElementById('modalDate').textContent      = fmt(parseISO(g.d));
+    document.getElementById('modalPlatforms').textContent = (g.p||[]).join(', ');
+    document.getElementById('modalGenres').textContent    = (g.g||[]).join(', ');
+    const noteEl = document.getElementById('modalNote');
+    if(g.note){ noteEl.style.display=''; noteEl.innerHTML=`<b>Note</b> ${g.note}`; }
+    else { noteEl.style.display='none'; noteEl.textContent=''; }
+
+    // Hero image
+    const hero = document.getElementById('modalHero');
+    const imgUrl = steamImg(g);
+    if(imgUrl){
+      const img = document.createElement('img');
+      img.alt = `Illustration ${g.t}`; img.src=imgUrl; img.loading='lazy';
+      img.onerror = ()=>{ hero.innerHTML='<div class="modal-line" style="padding:14px">Image Steam indisponible.</div>'; };
+      hero.innerHTML=''; hero.appendChild(img);
+    } else {
+      hero.innerHTML=`<div class="modal-line" style="padding:14px">Pas d'image Steam — ajoute un lien custom.</div>`;
+    }
+
+    // Actions
+    const actions = document.getElementById('modalActions');
+    actions.innerHTML='';
+    const url = steamUrl(g);
+    if(url){ const a=document.createElement('a'); a.className='btnlink'; a.href=url; a.target='_blank'; a.rel='noopener noreferrer'; a.textContent=g.steam_appid?'Ouvrir sur Steam':'Ouvrir le lien'; actions.appendChild(a); }
+    const copy = document.createElement('a'); copy.className='btnlink'; copy.href='#'; copy.textContent='Copier date & titre';
+    copy.addEventListener('click',e=>{ e.preventDefault(); navigator.clipboard?.writeText(`${fmt(parseISO(g.d))} — ${g.t}`); toast('Copié !'); SFX.blip('nav'); });
+    actions.appendChild(copy);
+
+    // Bouton DONE
+    const doneBtn = document.getElementById('doneToggleBtn');
+    function refreshDoneBtn(){ doneBtn.textContent = isDone(k) ? '↩ Retirer du fait' : '✅ Marquer comme fait'; doneBtn.className = isDone(k) ? 'ghost' : 'primary'; }
+    refreshDoneBtn();
+    doneBtn.onclick = ()=>{
+      toggleDone(k);
+      refreshDoneBtn();
+      render();
+      SFX.blip('nav');
+      toast(isDone(k)?'✅ Marqué comme fait !':'↩ Retiré des faits');
+    };
+
+    backdrop.style.display='flex';
+  }
+
+  function closeModal(){ backdrop.style.display='none'; SFX.blip('close'); }
+  document.getElementById('modalClose').addEventListener('click',()=>{ SFX.unlock(); closeModal(); });
+  backdrop.addEventListener('click', e=>{ if(e.target===backdrop){ SFX.unlock(); closeModal(); } });
+  window.addEventListener('keydown', e=>{ if(e.key==='Escape'){ SFX.unlock(); closeModal(); } });
+
+  // ── Home : grille années ──────────────────────────────────────────────────
+  function buildYearGrid(){
+    const grid = document.getElementById('yearGrid');
+    grid.innerHTML = '';
+    const max = maxUnlockedYear();
+    for(const y of YEARS_LIST){
+      const unlocked = y <= max;
+      const btn = document.createElement('button');
+      if(unlocked){
+        btn.className = 'year-btn primary';
+        btn.innerHTML = `<small>${y}</small><span class="badge"><span class="dot"></span> DISPONIBLE</span>`;
+        btn.addEventListener('click',()=>{ SFX.unlock(); showTimeline(y); });
+      } else {
+        const realEq = y + OFFSET;
+        btn.className = 'year-btn locked';
+        btn.innerHTML = `<small>${y}</small><span class="badge badge-locked"><span class="dot dot-locked"></span> Disponible en ${realEq}</span>`;
+        btn.addEventListener('click',()=>{ SFX.unlock(); toast(`⏳ ${y} sera disponible en ${realEq} !`); SFX.blip('error'); });
+      }
+      grid.appendChild(btn);
+    }
+  }
+
+  // ── Save buttons ──────────────────────────────────────────────────────────
+  function updateSaveButtons(){
+    document.getElementById('exportSaveBtn').onclick = ()=>{ SFX.unlock(); exportSave(); };
+    document.getElementById('importSaveBtn').onclick = ()=>{ SFX.unlock(); document.getElementById('importFileInput').click(); };
+    document.getElementById('importFileInput').onchange = e=>{ if(e.target.files[0]) importSave(e.target.files[0]); };
+  }
+
+  // ── SFX toggles ───────────────────────────────────────────────────────────
+  function applySfxUI(){
+    const on = SFX.isEnabled();
+    ['sfxToggle','sfxToggleHome'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.toggle('on',on); });
+  }
+  function toggleSfx(){ SFX.unlock(); const next=!SFX.isEnabled(); SFX.setEnabled(next); saveSfxPref(next); applySfxUI(); if(next) SFX.blip('nav'); }
+  document.getElementById('sfxBtn').addEventListener('click',     e=>{ e.stopPropagation(); toggleSfx(); });
+  document.getElementById('sfxBtnHome').addEventListener('click', e=>{ e.stopPropagation(); toggleSfx(); });
+  window.addEventListener('pointerdown', SFX.unlock, {once:true});
+
+  // ── Boot ──────────────────────────────────────────────────────────────────
+  SFX.setEnabled(loadSfxPref());
+  applySfxUI();
+  buildYearGrid();
+  updateSaveButtons();
+  preloadAllYears();
+
+  const savedYear = Number(lsGet(LS.YEAR));
+  if(location.hash && location.hash !== '#home'){
+    const hashYear = Number(location.hash.replace('#',''));
+    showTimeline(!isNaN(hashYear) ? hashYear : (!isNaN(savedYear)?savedYear:maxUnlockedYear()));
+  } else if(!isNaN(savedYear) && savedYear > 0 && lsGet(LS.YEAR)){
+    showHome();
+  } else {
+    showHome();
+  }
+
+</script>
+</body>
+</html>

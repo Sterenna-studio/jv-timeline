@@ -1,0 +1,190 @@
+[
+  {
+    "d": "2017-01-24",
+    "t": "Resident Evil 7",
+    "p": [
+      "PC",
+      "PS4",
+      "XB1"
+    ],
+    "g": [
+      "Survival Horror"
+    ],
+    "steam_appid": 418370
+  },
+  {
+    "d": "2017-03-03",
+    "t": "The Legend of Zelda: Breath of the Wild",
+    "p": [
+      "Switch",
+      "Wii U"
+    ],
+    "g": [
+      "Action-Aventure",
+      "Open World"
+    ]
+  },
+  {
+    "d": "2017-04-11",
+    "t": "Persona 5",
+    "p": [
+      "PS4",
+      "PS3"
+    ],
+    "g": [
+      "JRPG"
+    ]
+  },
+  {
+    "d": "2017-05-05",
+    "t": "Prey (2017)",
+    "p": [
+      "PC",
+      "PS4",
+      "XB1"
+    ],
+    "g": [
+      "Immersive Sim",
+      "FPS"
+    ],
+    "steam_appid": 480490
+  },
+  {
+    "d": "2017-05-26",
+    "t": "Injustice 2",
+    "p": [
+      "PC",
+      "PS4",
+      "XB1"
+    ],
+    "g": [
+      "Fighting"
+    ],
+    "steam_appid": 627270
+  },
+  {
+    "d": "2017-06-20",
+    "t": "Crash Bandicoot N. Sane Trilogy",
+    "p": [
+      "PS4"
+    ],
+    "g": [
+      "Plateforme",
+      "Remaster"
+    ]
+  },
+  {
+    "d": "2017-07-25",
+    "t": "Pyre",
+    "p": [
+      "PC",
+      "PS4"
+    ],
+    "g": [
+      "RPG",
+      "Indé"
+    ],
+    "steam_appid": 462770
+  },
+  {
+    "d": "2017-08-29",
+    "t": "Uncharted: The Lost Legacy",
+    "p": [
+      "PS4"
+    ],
+    "g": [
+      "Action",
+      "Aventure"
+    ]
+  },
+  {
+    "d": "2017-09-01",
+    "t": "Destiny 2",
+    "p": [
+      "PC",
+      "PS4",
+      "XB1"
+    ],
+    "g": [
+      "FPS",
+      "Online"
+    ],
+    "steam_appid": 1085660
+  },
+  {
+    "d": "2017-09-29",
+    "t": "Cuphead",
+    "p": [
+      "PC",
+      "XB1"
+    ],
+    "g": [
+      "Run & Gun",
+      "Indé"
+    ],
+    "steam_appid": 268910
+  },
+  {
+    "d": "2017-10-27",
+    "t": "Super Mario Odyssey",
+    "p": [
+      "Switch"
+    ],
+    "g": [
+      "Plateforme",
+      "Nintendo"
+    ]
+  },
+  {
+    "d": "2017-11-03",
+    "t": "Call of Duty: WWII",
+    "p": [
+      "PC",
+      "PS4",
+      "XB1"
+    ],
+    "g": [
+      "FPS"
+    ],
+    "steam_appid": 476600
+  },
+  {
+    "d": "2017-11-07",
+    "t": "Assassin's Creed Origins",
+    "p": [
+      "PC",
+      "PS4",
+      "XB1"
+    ],
+    "g": [
+      "Action-RPG",
+      "Open World"
+    ],
+    "steam_appid": 582160
+  },
+  {
+    "d": "2017-11-10",
+    "t": "Wolfenstein II: The New Colossus",
+    "p": [
+      "PC",
+      "PS4",
+      "XB1"
+    ],
+    "g": [
+      "FPS",
+      "Action"
+    ],
+    "steam_appid": 612880
+  },
+  {
+    "d": "2017-12-01",
+    "t": "Xenoblade Chronicles 2",
+    "p": [
+      "Switch"
+    ],
+    "g": [
+      "JRPG",
+      "Nintendo"
+    ]
+  }
+]
